@@ -22,8 +22,7 @@
     "correction",
     "calibration",
     "mapping",
-    "fit",
-    "node-red"
+    "fit"
   ],
   "author": "Sebastian Barwe",
   "license": "Apache-2.0",
@@ -44,6 +43,6 @@
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=6"
+    "node": ">=4"
   }
 }
