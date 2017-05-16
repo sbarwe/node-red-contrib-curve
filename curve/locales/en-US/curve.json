@@ -1,0 +1,19 @@
+{
+    "curve": {
+        "label": {
+            "valuex": "Value x",
+            "fexpression": "Function f(x)",
+            "outputtype": "Outputtype",
+            "tip": "You can use Mustache syntax to use variable parts on the function per msg. It is possible to use conditions like (x%2)*(x>1) to create complex graphs."
+        },
+        "placeholder": {
+            "valuex": "payload",
+            "fexpression": "(x = current value)"
+        },
+        "option": {
+            "float": "Float",
+            "ceil": "Rounded integer (Ceil)",
+            "floor": "Rounded integer (floor)"
+        }
+    }
+}

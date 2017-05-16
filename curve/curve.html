@@ -1,0 +1,225 @@
+<!--
+  Copyright (c) 2017 Sebastian Barwe
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/javascript">
+  var fpoptions = {
+    target: '#function-plot-graph',
+
+    grid: true,
+    disableZoom: false,
+    xAxis: {
+      label: 'x',
+      domain: [0, 1]
+    },
+    yAxis: {
+      label: 'y = f(x)',
+      domain: [0, 1]
+    },
+
+    annotations: [{
+      x: 1,
+      text: 'x = 1'
+    }, {
+      y: 1,
+      text: 'y = 1'
+    }]
+  };
+
+  function plot() {
+    try {
+      functionPlot(fpoptions);
+      $('#function-plot-graph-message').text('');
+    }
+    catch (err) {
+      $('#function-plot-graph-message').text(err.message);
+    }
+  }
+
+  RED.nodes.registerType('curve', {
+    category: 'function', // Pallette category
+    defaults: {
+      fexpression: {
+        value: '', required: true, validate: function (f) {
+          try {
+            functionPlot.eval.builtIn({ fn: f.replace(/{{.*}}/, '1') }, 'fn', { x: 0 })
+          } catch (e) { return false; }
+          return true;
+        }
+      },
+      valuex: { value: '', required: false },
+      outputtype: { value: "float", required: false },
+      // xrangestart: { value: Infinity, validate: RED.validators.number() },
+      // xrangeend: { value: Infinity, validate: RED.validators.number() },
+      // infinite: { value: false },
+      name: { value: '' },
+      topic: { value: '' }
+    },
+
+    inputs: 1,
+    outputs: 1,
+    color: '#E6E0F8',
+    paletteLabel: 'f(x) curve', // can be a function
+    label: function () { return this.name || this.fexpression || 'curve f(x)' }, // can be a string
+    //labelStyle: 'node_label' // string or function, css class: node_label or node_label_italic
+    inputLabels: 'number x', // string or function, NR v0.17+
+    outputLabels: function () { return 'f(x) = ' + this.fexpression }, // string or function, NR v0.17+
+    icon: "function.png", // stock icon, or use own in icons dir
+    //align: 'left',
+    // DEBUG - Open the dev console on the admin page to view output
+    oneditprepare: function () {
+
+      $("#node-input-valuex").typedInput({
+        default: "string",
+        types: [{
+          value: "string",
+          label: "msg"
+        }]
+      });
+
+      var node = this;
+      //fpoptions.plugins = [functionPlot.plugins.zoomBox()];
+      let f = this.fexpression.replace(/{{.*}}/, '1');
+
+      fpoptions.data = [{
+        fn: f != "" ? f : "0",
+        color: 'red',
+        graphType: 'polyline'
+      }];
+
+      plot();
+
+      var timerid;
+      $('#node-input-fexpression').on("input", function (e) {
+        var value = $(this).val();
+        if ($(this).data("lastval") != value) {
+
+          $(this).data("lastval", value);
+
+          value = value.replace(/{{.*}}/, '1');
+          clearTimeout(timerid);
+
+          timerid = setTimeout(function () {
+            fpoptions.data = [{
+              fn: value != "" ? value : "0",
+              color: 'red',
+              graphType: 'polyline'
+            }];
+
+            plot();
+          }, 500);
+        };
+      });
+
+      // $("#node-input-fexpression").typedInput({
+      //   default: 'string', types: [{
+      //     value: "string",
+      //     label: "f(x) ="
+      //   }]
+      // });
+
+      $('#node-input-outputtype').select(this.outputtype);
+
+      var flib = {
+        "easeOutElastic": "-0.5*exp(-6x)*(-2*exp(6x) + sin(12x) + 2cos(12x))",
+        "easeOutQuad": "-{{change}}*(x/{{duration}})*(x-2)+{{start}}",
+        "easeInOutQuad": "((2*x/{{duration}})<1)*({{change}}*0.5*x*x) + (2*x/{{duration}}>=1)*-0.5*{{change}}*((x-1)*(x-3)-1) + {{start}}"
+      };
+
+      Object.keys(flib).forEach(function (fname) {
+        let el = $("<li/>").append($("<a/>").attr({ "href": "#" + flib[fname] })
+          .click(function () {
+            $("#node-input-fexpression").val(this.href.split('#')[1]);
+            $('#node-input-fexpression').trigger("input");
+          })
+          .text(fname)).appendTo("#node-input-fexpression-lookup");
+      });
+    },
+    // oneditsave: function () { },
+    // oneditcancel: function () { },
+    // oneditdelete: function () {  },
+    oneditresize: function (size) {
+      fpoptions.width = 0.95 * size.width;
+      fpoptions.height = 0.40 * size.height;
+      plot();
+    },
+    // Do any setup when node added to palette
+    onpaletteadd: function () {
+      $.getScript('node-red-contrib-curve/function-plot.min.js')
+    },
+    onpaletteremove: function () { },
+  });
+
+</script>
+
+<script type="text/x-red" data-template-name="curve">
+  <div id="function-plot-graph" style="width:90%">
+  </div>
+  <div id="function-plot-graph-message" style="width:90%; color:red; ">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-fexpression"><i class="fa fa-industry"></i> <span data-i18n="curve.label.fexpression"></span></label>
+    <input type="text" id="node-input-fexpression" style="width:57%;" data-i18n="[placeholder]curve.placeholder.fexpression"
+    />
+    <div class="btn-group" style="margin-left: 5px;">
+      <a class="editor-button" data-toggle="dropdown"><i class="fa fa-book"></i> <i class="fa fa-caret-down"></i></a>
+      <ul class="dropdown-menu pull-right" role="menu" id="node-input-fexpression-lookup">
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-valuex">   <i class='fa fa-tasks'></i>        <span data-i18n="curve.label.valuex"></span>        </label>
+    <input type="text" id="node-input-valuex" style="width:70%;" data-i18n="[placeholder]curve.placeholder.valuex">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-outputtype"><i class="fa fa-compress"></i> <span data-i18n="curve.label.outputtype"></span></label>
+    <select id="node-input-outputtype" style="width:70%;">
+            <option value="float" data-i18n="curve.option.float"></option>
+            <option value="ceil"  data-i18n="curve.option.ceil"></option>
+            <option value="floor" data-i18n="curve.option.floor"></option>
+        </select>
+  </div>
+  <!--
+    <div class="form-row">
+        <label for="node-input-xrangestart"><i class="fa fa-tasks"></i> X-Range From:</label>
+        <input type="text" id="node-input-xrangestart" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-xrangeend"><i class="fa fa-tasks"></i> X-Range To:</label>
+        <input type="text" id="node-input-xrangeend" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-infinite"><i class="fa fa-tasks"></i> Infinite function</label>
+        <input type="checkbox" id="node-input-infinite" />  
+    </div>
+   -->
+  <!-- Node Instance Name -->
+  <div class="form-row">
+    <!-- http://fortawesome.github.io/Font-Awesome/icons/ -->
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" style="width:70%;">
+  </div>
+
+  <!-- Some in-line help -->
+  <div class="form-tips">
+    <b>Tip:</b> <span data-i18n="curve.label.tip"></span>
+  </div>
+
+
+</script>

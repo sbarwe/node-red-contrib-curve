@@ -1,0 +1,90 @@
+<script type="text/x-red" data-help-name="curve" data-lang="en-US">
+    <p>
+        A function node for a mathematical expression f(x) for creating simulation data, characteristics, calibration data and other
+        numerical output based on a numeric input.
+
+        <ol>
+            <li>
+                easy expression formula like x^2, sqrt(x), nthRoot(x), exp(x), sin(x), cos(x) etc. (see <a href="http://maurizzzio.github.io/function-plot/"
+                    target="_blank">function-plot</a>)
+            </li>
+            <li>
+                define which property from <code>msg</code> to use for x value input
+            </li>
+            <li>
+                use Mustache-Syntax to include variables from <code>msg</code> or <code>context</code>
+            </li>
+            <li>
+                Use the modulo-operator (%) to create infinite ranged functions like <a href="http://easings.net/" target="_blank">easings</a>.
+            </li>
+        </ol>
+    </p>
+
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">number</span></dt>
+        <dd> the ordinal x of the function to calculate the result from. </dd>
+
+        <dt class="optional">function <span class="property-type">string</span></dt>
+        <dd> if defined will overwrite the node's defined function</dd>
+
+        <dt class="optional">topic <span class="property-type">string</span></dt>
+        <dd> the MQTT topic to publish to.</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li>Standard output
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">number</span></dt>
+                <dd>The result of the function calculation. Returns NaN if x was out of defined range.</dd>
+
+                <dt>topic <span class="property-type">string</span></dt>
+                <dd>A copy of any inbound topic if present. Otherwise, the topic from the node's settings.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Node Settings</h3>
+    <dl>
+        <dt>Value x</dt>
+        <dd>The property from <code>msg</code> to use for the value x for the function input</dd>
+        <dt>Function</dt>
+        <dd>
+            A function f(x) defined according to <a href="https://github.com/maurizzzio/built-in-math-eval" target="_blank">built-in-math-eval</a>            as a function expression. You can use Mustache-Syntax to include values from the <code>flow</code> or <code>global</code>            context or <code>msg</code>. The function would then be reevaluated on each input.
+
+        </dd>
+        <!--
+        <dt>Range</dt>
+        <dd>A short description shown in the admin interface</dd>
+        <dt>Infinity</dt>
+        <dd>If set to true when a range is defined, the range will be looped, like f(x%rangewidth) </dd>
+        -->
+        <dt>Name</dt>
+        <dd>A short description shown in the admin interface</dd>
+        <dt>Topic</dt>
+        <dd>A topic name to use if the incoming msg does not contain one.</dd>
+    </dl>
+
+    <h3>Performance</h3>
+    <p>
+        The node is most performant when not using Mustache-Syntax or redefine function expression via msg.function as this leads
+        to an recompilation of the function expression with each incoming <code>msg</code>. There is currently no
+        function expression cache. This node will reuse the incoming <code>msg</code> for its output.
+    </p>>
+    <p>
+        Note: to gain more performance use a function-node for calculation. This is more a convenient node for easier setup of curves.
+    </p>
+
+    <h3>Details</h3>
+    <p>
+        When using Mustache-Syntax these values will be replaces bei "0" for the preview window, so function may not get plotted
+        correctly. You can use the node-red-contrib-counter node to create a continous input stream of (0,1,2,4,5,6...).
+        For more information, see the GitHub page for <a href="https://github.com/sbarwe/node-red-contrib-curve">node-red-contrib-curve</a>
+    </p>
+    <p>
+        This node uses the work of Mauricio Poppe for visualization and function expression parsing. This node-red node is just a
+        wrapper around this library.
+    </p>
+</script>
