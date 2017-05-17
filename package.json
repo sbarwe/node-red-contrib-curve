@@ -11,6 +11,7 @@
     "url": "git+https://github.com/sbarwe/node-red-contrib-curve.git"
   },
   "keywords": [
+	"node-red",
     "math",
     "expression",
     "characteristics",
