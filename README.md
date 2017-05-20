@@ -26,7 +26,7 @@ A function node for a mathematical expression f(x) for creating simulation data,
 
 # Node Settings
 
-## Value x< 
+## Value x
 
 The property from <code>msg</code> to use for the value x for the function input
 
@@ -49,7 +49,7 @@ This node uses the work of Mauricio Poppe for visualization and function express
 
 # Changes
 
-See [Change Log](CHANGELOG) for details
+See [Change Log](CHANGELOG.md) for details
 
 [![NPM](https://nodei.co/npm/node-red-contrib-curve.png)](https://nodei.co/npm/node-red-contrib-curve/)
 
