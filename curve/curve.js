@@ -67,10 +67,6 @@ module.exports = function(RED) {
     this.outputtype = config.outputtype || null // float = as is Float, floor = Floored integer, ceil =  Ceiled integer
     if (this.outputtype == 'float') this.outputtype = null
     this.valuex = config.valuex || null // use msg.payload per default for x value
-
-    // this.xrange_start = config.xrangestart || Infinity;
-    // this.xrange_end = config.xrangeend || Infinity;
-    // this.inf = config.infinite || false;
     this.name = config.name || ''
     this.topic = config.topic || '' // NB: will be overwritten by msg.topic if recived
 
@@ -80,7 +76,7 @@ module.exports = function(RED) {
 
     // Create the node instance
     RED.nodes.createNode(this, config)
-    RED.library.register("curve");
+    RED.library.register('curve')
 
     // handler function for node input events (when a node instance receives a msg)
     function nodeInputHandler(msg) {
@@ -102,26 +98,6 @@ module.exports = function(RED) {
           }
 
           let x = parseFloat(msg.payload)
-
-          /*
-          // if out of range then send a not valid result
-          if (
-            node.xrange_start < node.xrange_end &&
-            ((node.xrange_start != Infinity &&
-              x < node.xrange_start) ||
-              (node.xrange_end != Infinity && x > node.xrange_end))
-          ) {
-            // if not looped then return NaN if  out if range
-            if (!node.inf) {
-              msg.payload = NaN;
-              node.send(msg);
-              return;
-            } else
-              msg.payload =
-                node.xrange_start +
-                x % (node.xrange_end - node.xrange_start);
-          }
-          */
 
           if (msg.function === undefined && !node.useMustache) {
             msg.payload = node.f.eval({ x: x })

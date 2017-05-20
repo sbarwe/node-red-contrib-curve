@@ -61,9 +61,6 @@
       },
       valuex: { value: '', required: false },
       outputtype: { value: "float", required: false },
-      // xrangestart: { value: Infinity, validate: RED.validators.number() },
-      // xrangeend: { value: Infinity, validate: RED.validators.number() },
-      // infinite: { value: false },
       name: { value: '' },
       topic: { value: '' }
     },
@@ -73,12 +70,9 @@
     color: '#E6E0F8',
     paletteLabel: 'f(x) curve', // can be a function
     label: function () { return this.name || this.fexpression || 'curve f(x)' }, // can be a string
-    //labelStyle: 'node_label' // string or function, css class: node_label or node_label_italic
     inputLabels: 'number x', // string or function, NR v0.17+
     outputLabels: function () { return 'f(x) = ' + this.fexpression }, // string or function, NR v0.17+
     icon: "function.png", // stock icon, or use own in icons dir
-    //align: 'left',
-    // DEBUG - Open the dev console on the admin page to view output
     oneditprepare: function () {
 
       $("#node-input-valuex").typedInput({
@@ -102,11 +96,11 @@
       plot();
 
       var timerid;
+      var lastval;
       var inputChange = function (value) {
-        //var value = $(this).val();
-        if ($(this).data("lastval") != value) {
+        if (lastval != value) {
 
-          $(this).data("lastval", value);
+          lastval = value;
 
           value = value.replace(/{{.*}}/, '1');
           clearTimeout(timerid);
@@ -123,32 +117,7 @@
         };
       };
 
-      $('#node-input-fexpression').on("input", inputChange);
-
-      // $("#node-input-fexpression").typedInput({
-      //   default: 'string', types: [{
-      //     value: "string",
-      //     label: "f(x) ="
-      //   }]
-      // });
-
       $('#node-input-outputtype').select(this.outputtype);
-      /*
-      var flib = {
-        "easeOutElastic": "-0.5*exp(-6x)*(-2*exp(6x) + sin(12x) + 2cos(12x))",
-        "easeOutQuad": "-{{change}}*(x/{{duration}})*(x-2)+{{start}}",
-        "easeInOutQuad": "((2*x/{{duration}})<1)*({{change}}*0.5*x*x) + (2*x/{{duration}}>=1)*-0.5*{{change}}*((x-1)*(x-3)-1) + {{start}}"
-      };
-
-      Object.keys(flib).forEach(function (fname) {
-        let el = $("<li/>").append($("<a/>").attr({ "href": "#" + flib[fname] })
-          .click(function () {
-            $("#node-input-fexpression").val(this.href.split('#')[1]);
-            $('#node-input-fexpression').trigger("input");
-          })
-          .text(fname)).appendTo("#node-input-fexpression-lookup");
-      });
-      */
 
       this.editor = RED.editor.createEditor({
         id: 'node-input-fexpression-editor',
@@ -167,12 +136,6 @@
         url: "curve", // where to get the data from
         type: "node-red-contrib-curve", // the type of object the library is for
         editor: this.editor,
-        /*
-        {
-          setValue: function (newval) { $('#node-input-fexpression').val(newval); },
-          getValue: function () { return $('#node-input-fexpression').val(); }
-        }, //,  this.editor, // the field name the main text body goes to
-        */
         mode: "ace/mode/handlebars",
         fields: ['name']
       });
@@ -190,7 +153,7 @@
       fpoptions.height = 0.40 * size.height;
       plot();
     },
-    // Do any setup when node added to palette
+
     onpaletteadd: function () {
       $.getScript('node-red-contrib-curve/function-plot.min.js')
     },
@@ -214,14 +177,7 @@
     <label for="node-input-fexpression-editor"><i class="fa fa-industry"></i> <span data-i18n="curve.label.fexpression"></span></label>
     <input type="hidden" id="node-input-fexpression" autofocus="autofocus">
 
-    <!-- <input type="text" id="node-input-fexpression" style="width:70%;" data-i18n="[placeholder]curve.placeholder.fexpression" /> -->
-    <!--
-    <div class="btn-group" style="margin-left: 5px;">
-      <a class="editor-button" data-toggle="dropdown"><i class="fa fa-book"></i> <i class="fa fa-caret-down"></i></a>
-      <ul class="dropdown-menu pull-right" role="menu" id="node-input-fexpression-lookup">
-      </ul>
-    </div>
--->
+
   </div>
   <div class="form-row node-text-editor-row">
     <div style="height: 70px; min-height:50px;" class="node-text-editor" id="node-input-fexpression-editor"></div>
@@ -240,23 +196,7 @@
             <option value="floor" data-i18n="curve.option.floor"></option>
         </select>
   </div>
-  <!--
-    <div class="form-row">
-        <label for="node-input-xrangestart"><i class="fa fa-tasks"></i> X-Range From:</label>
-        <input type="text" id="node-input-xrangestart" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-xrangeend"><i class="fa fa-tasks"></i> X-Range To:</label>
-        <input type="text" id="node-input-xrangeend" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-infinite"><i class="fa fa-tasks"></i> Infinite function</label>
-        <input type="checkbox" id="node-input-infinite" />  
-    </div>
-   -->
 
-
-  <!-- Some in-line help -->
   <div class="form-row" style="width:100%;">
     <div class="form-tips">
       <b>Tip:</b> <span data-i18n="curve.label.tip"></span>
