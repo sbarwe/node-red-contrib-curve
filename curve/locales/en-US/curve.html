@@ -19,7 +19,16 @@
             </li>
         </ol>
     </p>
-
+    <h3>Examples</h3>
+    <dl>
+        <dt>easeOutElastic</dt>
+        <dd>-0.5*exp(-6x)*(-2*exp(6x) + sin(12x) + 2cos(12x))</dd>
+        <dt>easeOutQuad</dt>
+        <dd>-{{change}}*(x/{{duration}})*(x-2)+{{start}}</dd>
+        <dt>easeInOutQuad</dt>
+        <dd>((2*x/{{duration}})
+            <1)*({{change}}*0.5*x*x) + (2*x/{{duration}}>=1)*-0.5*{{change}}*((x-1)*(x-3)-1) + {{start}}</dd>
+    </dl>
 
     <h3>Inputs</h3>
     <dl class="message-properties">

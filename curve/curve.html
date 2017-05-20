@@ -102,8 +102,8 @@
       plot();
 
       var timerid;
-      $('#node-input-fexpression').on("input", function (e) {
-        var value = $(this).val();
+      var inputChange = function (value) {
+        //var value = $(this).val();
         if ($(this).data("lastval") != value) {
 
           $(this).data("lastval", value);
@@ -121,7 +121,9 @@
             plot();
           }, 500);
         };
-      });
+      };
+
+      $('#node-input-fexpression').on("input", inputChange);
 
       // $("#node-input-fexpression").typedInput({
       //   default: 'string', types: [{
@@ -131,7 +133,7 @@
       // });
 
       $('#node-input-outputtype').select(this.outputtype);
-
+      /*
       var flib = {
         "easeOutElastic": "-0.5*exp(-6x)*(-2*exp(6x) + sin(12x) + 2cos(12x))",
         "easeOutQuad": "-{{change}}*(x/{{duration}})*(x-2)+{{start}}",
@@ -146,10 +148,43 @@
           })
           .text(fname)).appendTo("#node-input-fexpression-lookup");
       });
+      */
+
+      this.editor = RED.editor.createEditor({
+        id: 'node-input-fexpression-editor',
+        mode: 'ace/mode/handlebars',
+        value: $("#node-input-fexpression").val(),
+        globals: {
+          msg: true,
+          flow: true,
+          global: true
+        }
+      });
+
+      this.editor.on("input", function () { inputChange(node.editor.getValue()) });
+
+      RED.library.create({
+        url: "curve", // where to get the data from
+        type: "node-red-contrib-curve", // the type of object the library is for
+        editor: this.editor,
+        /*
+        {
+          setValue: function (newval) { $('#node-input-fexpression').val(newval); },
+          getValue: function () { return $('#node-input-fexpression').val(); }
+        }, //,  this.editor, // the field name the main text body goes to
+        */
+        mode: "ace/mode/handlebars",
+        fields: ['name']
+      });
+
     },
-    // oneditsave: function () { },
-    // oneditcancel: function () { },
-    // oneditdelete: function () {  },
+    oneditsave: function () {
+      $("#node-input-fexpression").val(this.editor.getValue());
+      delete this.editor;
+
+    },
+    oneditcancel: function () { delete this.editor; },
+    oneditdelete: function () { delete this.editor; },
     oneditresize: function (size) {
       fpoptions.width = 0.95 * size.width;
       fpoptions.height = 0.40 * size.height;
@@ -165,31 +200,41 @@
 </script>
 
 <script type="text/x-red" data-template-name="curve">
-  <div id="function-plot-graph" style="width:90%">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name">
   </div>
-  <div id="function-plot-graph-message" style="width:90%; color:red; ">
+
+  <div id="function-plot-graph" style="width:100%;">
+  </div>
+  <div id="function-plot-graph-message" style="width:100%; color:red; ">
   </div>
 
   <div class="form-row">
-    <label for="node-input-fexpression"><i class="fa fa-industry"></i> <span data-i18n="curve.label.fexpression"></span></label>
-    <input type="text" id="node-input-fexpression" style="width:57%;" data-i18n="[placeholder]curve.placeholder.fexpression"
-    />
+    <label for="node-input-fexpression-editor"><i class="fa fa-industry"></i> <span data-i18n="curve.label.fexpression"></span></label>
+    <input type="hidden" id="node-input-fexpression" autofocus="autofocus">
+
+    <!-- <input type="text" id="node-input-fexpression" style="width:70%;" data-i18n="[placeholder]curve.placeholder.fexpression" /> -->
+    <!--
     <div class="btn-group" style="margin-left: 5px;">
       <a class="editor-button" data-toggle="dropdown"><i class="fa fa-book"></i> <i class="fa fa-caret-down"></i></a>
       <ul class="dropdown-menu pull-right" role="menu" id="node-input-fexpression-lookup">
-
       </ul>
     </div>
+-->
+  </div>
+  <div class="form-row node-text-editor-row">
+    <div style="height: 70px; min-height:50px;" class="node-text-editor" id="node-input-fexpression-editor"></div>
   </div>
 
   <div class="form-row">
     <label for="node-input-valuex">   <i class='fa fa-tasks'></i>        <span data-i18n="curve.label.valuex"></span>        </label>
-    <input type="text" id="node-input-valuex" style="width:70%;" data-i18n="[placeholder]curve.placeholder.valuex">
+    <input type="text" id="node-input-valuex" style="width:100%;" data-i18n="[placeholder]curve.placeholder.valuex">
   </div>
 
   <div class="form-row">
     <label for="node-input-outputtype"><i class="fa fa-compress"></i> <span data-i18n="curve.label.outputtype"></span></label>
-    <select id="node-input-outputtype" style="width:70%;">
+    <select id="node-input-outputtype" style="width:100%;">
             <option value="float" data-i18n="curve.option.float"></option>
             <option value="ceil"  data-i18n="curve.option.ceil"></option>
             <option value="floor" data-i18n="curve.option.floor"></option>
@@ -209,16 +254,13 @@
         <input type="checkbox" id="node-input-infinite" />  
     </div>
    -->
-  <!-- Node Instance Name -->
-  <div class="form-row">
-    <!-- http://fortawesome.github.io/Font-Awesome/icons/ -->
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" style="width:70%;">
-  </div>
+
 
   <!-- Some in-line help -->
-  <div class="form-tips">
-    <b>Tip:</b> <span data-i18n="curve.label.tip"></span>
+  <div class="form-row" style="width:100%;">
+    <div class="form-tips">
+      <b>Tip:</b> <span data-i18n="curve.label.tip"></span>
+    </div>
   </div>
 
 

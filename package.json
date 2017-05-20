@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-curve",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node to calculate output by a given mathematical function expression",
   "main": "none",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/sbarwe/node-red-contrib-curve.git"
   },
   "keywords": [
-	"node-red",
+    "node-red",
     "math",
     "expression",
     "characteristics",

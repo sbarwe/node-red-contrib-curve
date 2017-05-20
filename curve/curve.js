@@ -80,6 +80,7 @@ module.exports = function(RED) {
 
     // Create the node instance
     RED.nodes.createNode(this, config)
+    RED.library.register("curve");
 
     // handler function for node input events (when a node instance receives a msg)
     function nodeInputHandler(msg) {
