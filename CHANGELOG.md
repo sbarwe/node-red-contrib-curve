@@ -1,15 +1,23 @@
-#### 1.0.1
+# Changelog
+
+## 1.0.2
+
+- fix function library icon placement
+
+## 1.0.1
+
 - using nodered library for function expressions
 - updated readme
 
-#### 1.0.0
+## 1.0.0
+
 - Published on flows.nodered.org
 
-#### 0.0.1 - alpha release
+## 0.0.1 - alpha release
 
-first release for testing purposes.
+- first release for testing purposes.
 
-# TODO
+## TODO
 - create function from given points (or support wolfram syntax)
 - copy js code for a function node from expression
 - use NR  for storing functions library
